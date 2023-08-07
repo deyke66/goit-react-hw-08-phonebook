@@ -1,11 +1,31 @@
-import PropTypes from 'prop-types';
 import { nanoid } from 'nanoid';
 import style from './Phonebook.module.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectContacts } from 'redux/contacts/selectors';
+import { addContact } from 'redux/contacts/operations';
 
-export const Phonebook = ({ onSubmit }) => {
+export const Phonebook = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+  const handleSubmitForm = e => {
+    e.preventDefault();
+    const contactName = e.target.elements.name.value;
+    const contactNumber = e.target.elements.number.value;
+    const newContact = {
+      name: contactName,
+      number: contactNumber,
+    };
+    dispatch(addContact(newContact));
+
+    if (contacts.some(i => i.name === contactName)) {
+      alert(`You alraeady have a ${contactName} in contacts`);
+      return;
+    }
+    e.target.reset();
+  };
   return (
     <div>
-      <form onSubmit={onSubmit} className={style.form}>
+      <form onSubmit={handleSubmitForm} className={style.form}>
         <label htmlFor={nanoid()} className={style.label}>
           Name
           <input
@@ -35,8 +55,4 @@ export const Phonebook = ({ onSubmit }) => {
       </form>
     </div>
   );
-};
-
-Phonebook.propTypes = {
-  onSubmit: PropTypes.func,
 };
